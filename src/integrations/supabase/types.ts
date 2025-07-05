@@ -9,7 +9,96 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      clientes: {
+        Row: {
+          contato: string | null
+          created_at: string
+          id: string
+          nome: string
+          observacoes: string | null
+          user_id: string | null
+        }
+        Insert: {
+          contato?: string | null
+          created_at?: string
+          id?: string
+          nome: string
+          observacoes?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          contato?: string | null
+          created_at?: string
+          id?: string
+          nome?: string
+          observacoes?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      fornecedores: {
+        Row: {
+          contato: string | null
+          created_at: string
+          id: string
+          nome: string
+          observacoes: string | null
+          user_id: string | null
+        }
+        Insert: {
+          contato?: string | null
+          created_at?: string
+          id?: string
+          nome: string
+          observacoes?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          contato?: string | null
+          created_at?: string
+          id?: string
+          nome?: string
+          observacoes?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      movimentacoes: {
+        Row: {
+          categoria: string
+          created_at: string
+          data: string
+          descricao: string | null
+          id: string
+          status: string
+          tipo: string
+          user_id: string | null
+          valor: number
+        }
+        Insert: {
+          categoria: string
+          created_at?: string
+          data: string
+          descricao?: string | null
+          id?: string
+          status: string
+          tipo: string
+          user_id?: string | null
+          valor: number
+        }
+        Update: {
+          categoria?: string
+          created_at?: string
+          data?: string
+          descricao?: string | null
+          id?: string
+          status?: string
+          tipo?: string
+          user_id?: string | null
+          valor?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

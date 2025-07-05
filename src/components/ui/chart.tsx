@@ -1,4 +1,3 @@
-
 import * as React from "react"
 import * as RechartsPrimitive from "recharts"
 import { TooltipProps } from "recharts"
@@ -102,7 +101,16 @@ ${colorConfig
 
 const ChartTooltip = RechartsPrimitive.Tooltip
 
-interface ChartTooltipContentProps extends TooltipProps<number, string> {
+interface ChartTooltipContentProps {
+  active?: boolean
+  payload?: Array<{
+    value?: number
+    name?: string
+    dataKey?: string
+    color?: string
+    payload?: any
+  }>
+  label?: any
   className?: string
   hideLabel?: boolean
   hideIndicator?: boolean
@@ -112,6 +120,7 @@ interface ChartTooltipContentProps extends TooltipProps<number, string> {
   labelFormatter?: (value: any, payload: any) => React.ReactNode
   formatter?: (value: any, name: any, item: any, index: number, payload: any) => React.ReactNode
   labelClassName?: string
+  color?: string
 }
 
 const ChartTooltipContent = React.forwardRef<

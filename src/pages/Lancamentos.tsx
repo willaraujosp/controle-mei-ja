@@ -8,27 +8,21 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { TrendingUp, TrendingDown, Plus, Edit, Trash2, Filter } from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
+import { TrendingUp, TrendingDown, Plus, Edit, Trash2 } from 'lucide-react';
 import Layout from '@/components/Layout';
+import { useMovimentacoes, type Movimentacao } from '@/hooks/useMovimentacoes';
 
 const Lancamentos = () => {
-  const [lancamentos, setLancamentos] = useState([
-    { id: 1, tipo: 'entrada', valor: 1500.00, categoria: 'Vendas', descricao: 'Venda de produto A', data: '2024-07-05', status: 'Recebido' },
-    { id: 2, tipo: 'saida', valor: 300.00, categoria: 'Fornecedores', descricao: 'Compra de matéria prima', data: '2024-07-04', status: 'Pago' },
-    { id: 3, tipo: 'entrada', valor: 800.00, categoria: 'Serviços', descricao: 'Consultoria técnica', data: '2024-07-03', status: 'Pendente' },
-    { id: 4, tipo: 'saida', valor: 150.00, categoria: 'Operacional', descricao: 'Conta de energia', data: '2024-07-02', status: 'Pago' },
-  ]);
-
+  const { movimentacoes, loading, addMovimentacao, updateMovimentacao, deleteMovimentacao } = useMovimentacoes();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingLancamento, setEditingLancamento] = useState(null);
+  const [editingLancamento, setEditingLancamento] = useState<Movimentacao | null>(null);
   const [formData, setFormData] = useState({
-    tipo: '',
+    tipo: '' as 'entrada' | 'saida' | '',
     valor: '',
     categoria: '',
     descricao: '',
     data: new Date().toISOString().split('T')[0],
-    status: 'Pendente'
+    status: 'pendente' as 'pago' | 'pendente' | 'recebido'
   });
 
   const categorias = {
@@ -43,62 +37,57 @@ const Lancamentos = () => {
       categoria: '',
       descricao: '',
       data: new Date().toISOString().split('T')[0],
-      status: 'Pendente'
+      status: 'pendente'
     });
     setEditingLancamento(null);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!formData.tipo || !formData.valor || !formData.categoria) {
+      return;
+    }
+
+    const lancamentoData = {
+      tipo: formData.tipo as 'entrada' | 'saida',
+      valor: parseFloat(formData.valor),
+      categoria: formData.categoria,
+      descricao: formData.descricao,
+      status: formData.status,
+      data: formData.data
+    };
+
+    let success = false;
+    
     if (editingLancamento) {
-      // Editar
-      setLancamentos(prev => prev.map(item => 
-        item.id === editingLancamento.id 
-          ? { ...item, ...formData, valor: parseFloat(formData.valor) }
-          : item
-      ));
-      toast({
-        title: "Lançamento atualizado!",
-        description: "As alterações foram salvas com sucesso.",
-      });
+      success = await updateMovimentacao(editingLancamento.id, lancamentoData);
     } else {
-      // Adicionar novo
-      const novoLancamento = {
-        id: Date.now(),
-        ...formData,
-        valor: parseFloat(formData.valor)
-      };
-      setLancamentos(prev => [novoLancamento, ...prev]);
-      toast({
-        title: "Lançamento adicionado!",
-        description: "O novo lançamento foi criado com sucesso.",
-      });
+      const result = await addMovimentacao(lancamentoData);
+      success = result !== null;
     }
     
-    setIsDialogOpen(false);
-    resetForm();
+    if (success) {
+      setIsDialogOpen(false);
+      resetForm();
+    }
   };
 
-  const handleEdit = (lancamento: any) => {
+  const handleEdit = (lancamento: Movimentacao) => {
     setEditingLancamento(lancamento);
     setFormData({
       tipo: lancamento.tipo,
       valor: lancamento.valor.toString(),
       categoria: lancamento.categoria,
-      descricao: lancamento.descricao,
+      descricao: lancamento.descricao || '',
       data: lancamento.data,
       status: lancamento.status
     });
     setIsDialogOpen(true);
   };
 
-  const handleDelete = (id: number) => {
-    setLancamentos(prev => prev.filter(item => item.id !== id));
-    toast({
-      title: "Lançamento excluído!",
-      description: "O lançamento foi removido com sucesso.",
-    });
+  const handleDelete = async (id: string) => {
+    await deleteMovimentacao(id);
   };
 
   const formatCurrency = (value: number) => {
@@ -113,8 +102,18 @@ const Lancamentos = () => {
   };
 
   // Calcular totais
-  const totalEntradas = lancamentos.filter(l => l.tipo === 'entrada').reduce((acc, curr) => acc + curr.valor, 0);
-  const totalSaidas = lancamentos.filter(l => l.tipo === 'saida').reduce((acc, curr) => acc + curr.valor, 0);
+  const totalEntradas = movimentacoes.filter(l => l.tipo === 'entrada').reduce((acc, curr) => acc + Number(curr.valor), 0);
+  const totalSaidas = movimentacoes.filter(l => l.tipo === 'saida').reduce((acc, curr) => acc + Number(curr.valor), 0);
+
+  if (loading) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center h-64">
+          <p className="text-gray-600">Carregando lançamentos...</p>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
@@ -143,7 +142,7 @@ const Lancamentos = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="tipo">Tipo</Label>
-                    <Select value={formData.tipo} onValueChange={(value) => setFormData({...formData, tipo: value, categoria: ''})}>
+                    <Select value={formData.tipo} onValueChange={(value: 'entrada' | 'saida') => setFormData({...formData, tipo: value, categoria: ''})}>
                       <SelectTrigger>
                         <SelectValue placeholder="Selecione o tipo" />
                       </SelectTrigger>
@@ -174,7 +173,7 @@ const Lancamentos = () => {
                       <SelectValue placeholder="Selecione a categoria" />
                     </SelectTrigger>
                     <SelectContent>
-                      {formData.tipo && categorias[formData.tipo as keyof typeof categorias]?.map((cat) => (
+                      {formData.tipo && categorias[formData.tipo]?.map((cat) => (
                         <SelectItem key={cat} value={cat}>{cat}</SelectItem>
                       ))}
                     </SelectContent>
@@ -205,14 +204,14 @@ const Lancamentos = () => {
                   </div>
                   <div>
                     <Label htmlFor="status">Status</Label>
-                    <Select value={formData.status} onValueChange={(value) => setFormData({...formData, status: value})}>
+                    <Select value={formData.status} onValueChange={(value: 'pago' | 'pendente' | 'recebido') => setFormData({...formData, status: value})}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Pendente">Pendente</SelectItem>
-                        <SelectItem value="Pago">Pago</SelectItem>
-                        <SelectItem value="Recebido">Recebido</SelectItem>
+                        <SelectItem value="pendente">Pendente</SelectItem>
+                        <SelectItem value="pago">Pago</SelectItem>
+                        <SelectItem value="recebido">Recebido</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -284,68 +283,74 @@ const Lancamentos = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {lancamentos.map((lancamento) => (
-                <div key={lancamento.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-                  <div className="flex items-center space-x-4">
-                    <div className={`p-2 rounded-full ${
-                      lancamento.tipo === 'entrada' ? 'bg-green-100' : 'bg-red-100'
-                    }`}>
-                      {lancamento.tipo === 'entrada' ? (
-                        <TrendingUp className="h-4 w-4 text-green-600" />
-                      ) : (
-                        <TrendingDown className="h-4 w-4 text-red-600" />
-                      )}
+              {movimentacoes.length === 0 ? (
+                <p className="text-gray-500 text-center py-8">
+                  Nenhum lançamento encontrado. Clique em "Novo Lançamento" para começar.
+                </p>
+              ) : (
+                movimentacoes.map((lancamento) => (
+                  <div key={lancamento.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                    <div className="flex items-center space-x-4">
+                      <div className={`p-2 rounded-full ${
+                        lancamento.tipo === 'entrada' ? 'bg-green-100' : 'bg-red-100'
+                      }`}>
+                        {lancamento.tipo === 'entrada' ? (
+                          <TrendingUp className="h-4 w-4 text-green-600" />
+                        ) : (
+                          <TrendingDown className="h-4 w-4 text-red-600" />
+                        )}
+                      </div>
+                      <div>
+                        <p className="font-medium text-mei-text">{lancamento.descricao || `${lancamento.categoria} - ${lancamento.tipo}`}</p>
+                        <div className="flex items-center space-x-2 mt-1">
+                          <p className="text-sm text-gray-500">{formatDate(lancamento.data)}</p>
+                          <Badge variant="outline" className="text-xs">
+                            {lancamento.categoria}
+                          </Badge>
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-medium text-mei-text">{lancamento.descricao}</p>
-                      <div className="flex items-center space-x-2 mt-1">
-                        <p className="text-sm text-gray-500">{formatDate(lancamento.data)}</p>
-                        <Badge variant="outline" className="text-xs">
-                          {lancamento.categoria}
+                    
+                    <div className="flex items-center space-x-4">
+                      <div className="text-right">
+                        <p className={`font-bold ${
+                          lancamento.tipo === 'entrada' ? 'text-green-600' : 'text-red-600'
+                        }`}>
+                          {lancamento.tipo === 'entrada' ? '+' : '-'}{formatCurrency(Number(lancamento.valor))}
+                        </p>
+                        <Badge
+                          variant={lancamento.status === 'recebido' || lancamento.status === 'pago' ? 'default' : 'secondary'}
+                          className={`text-xs ${
+                            lancamento.status === 'recebido' || lancamento.status === 'pago' 
+                              ? 'bg-green-100 text-green-800' 
+                              : 'bg-yellow-100 text-yellow-800'
+                          }`}
+                        >
+                          {lancamento.status === 'pago' ? 'Pago' : lancamento.status === 'recebido' ? 'Recebido' : 'Pendente'}
                         </Badge>
+                      </div>
+                      
+                      <div className="flex space-x-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleEdit(lancamento)}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDelete(lancamento.id)}
+                          className="text-red-600 hover:text-red-800"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </div>
                     </div>
                   </div>
-                  
-                  <div className="flex items-center space-x-4">
-                    <div className="text-right">
-                      <p className={`font-bold ${
-                        lancamento.tipo === 'entrada' ? 'text-green-600' : 'text-red-600'
-                      }`}>
-                        {lancamento.tipo === 'entrada' ? '+' : '-'}{formatCurrency(lancamento.valor)}
-                      </p>
-                      <Badge
-                        variant={lancamento.status === 'Recebido' || lancamento.status === 'Pago' ? 'default' : 'secondary'}
-                        className={`text-xs ${
-                          lancamento.status === 'Recebido' || lancamento.status === 'Pago' 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-yellow-100 text-yellow-800'
-                        }`}
-                      >
-                        {lancamento.status}
-                      </Badge>
-                    </div>
-                    
-                    <div className="flex space-x-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleEdit(lancamento)}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDelete(lancamento.id)}
-                        className="text-red-600 hover:text-red-800"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </CardContent>
         </Card>
