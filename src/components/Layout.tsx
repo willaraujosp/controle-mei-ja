@@ -1,11 +1,10 @@
 
 import { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   TrendingUp, 
   FileText, 
-  Users, 
   Settings,
   Menu,
   X,
@@ -14,6 +13,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -22,22 +22,25 @@ interface LayoutProps {
 const Layout = ({ children }: LayoutProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
-  const navigate = useNavigate();
+  const { signOut } = useAuth();
 
   const menuItems = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Lançamentos', href: '/lancamentos', icon: TrendingUp },
     { name: 'Relatórios', href: '/relatorios', icon: FileText },
-    { name: 'Clientes', href: '/clientes', icon: Users },
     { name: 'Configurações', href: '/configuracoes', icon: Settings }
   ];
 
-  const handleLogout = () => {
-    toast({
-      title: "Logout realizado",
-      description: "Até logo!",
-    });
-    navigate('/');
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      toast({
+        title: "Logout realizado",
+        description: "Até logo!",
+      });
+    } catch (error) {
+      console.error('Erro no logout:', error);
+    }
   };
 
   // Simular expiração do teste (3 dias)
@@ -64,10 +67,10 @@ const Layout = ({ children }: LayoutProps) => {
             </Button>
             <Button
               variant="outline"
-              onClick={() => navigate('/')}
+              onClick={handleLogout}
               className="w-full"
             >
-              Voltar ao Início
+              Fazer Logout
             </Button>
           </div>
         </div>

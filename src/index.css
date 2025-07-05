@@ -48,6 +48,11 @@ All colors MUST be HSL.
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 8 100% 48%;
+
+    /* MEI Finance Colors */
+    --mei-red: 8 100% 48%; /* #F42000 */
+    --mei-text: 0 0% 18%; /* #2E2E2E */
+    --mei-gray: 0 0% 96%; /* #F5F5F5 */
   }
 }
 

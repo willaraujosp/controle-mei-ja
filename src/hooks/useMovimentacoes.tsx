@@ -35,7 +35,13 @@ export const useMovimentacoes = () => {
           variant: "destructive",
         });
       } else {
-        setMovimentacoes(data || []);
+        // Garantir que os tipos estão corretos
+        const typedData = (data || []).map(item => ({
+          ...item,
+          tipo: item.tipo as 'entrada' | 'saida',
+          status: item.status as 'pago' | 'pendente' | 'recebido'
+        }));
+        setMovimentacoes(typedData);
       }
     } catch (error) {
       console.error('Erro ao buscar movimentações:', error);

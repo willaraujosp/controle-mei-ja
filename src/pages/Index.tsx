@@ -16,9 +16,12 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
+import { useEffect } from 'react';
 
 const Index = () => {
   const navigate = useNavigate();
+  const { signUp, signIn, user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
@@ -26,19 +29,50 @@ const Index = () => {
     confirmPassword: ''
   });
 
+  // Redirecionar se já estiver logado
+  useEffect(() => {
+    if (user) {
+      navigate('/dashboard');
+    }
+  }, [user, navigate]);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Simular login
-    setTimeout(() => {
+    try {
+      const { error } = await signIn(formData.email, formData.password);
+      
+      if (error) {
+        if (error.message === 'Invalid login credentials') {
+          toast({
+            title: "Erro de Login",
+            description: "E-mail ou senha incorretos. Verifique suas credenciais ou cadastre-se.",
+            variant: "destructive"
+          });
+        } else {
+          toast({
+            title: "Erro",
+            description: error.message || "Erro ao fazer login",
+            variant: "destructive"
+          });
+        }
+      } else {
+        toast({
+          title: "Login realizado com sucesso!",
+          description: "Redirecionando para o dashboard...",
+        });
+        navigate('/dashboard');
+      }
+    } catch (error) {
       toast({
-        title: "Login realizado com sucesso!",
-        description: "Redirecionando para o dashboard...",
+        title: "Erro",
+        description: "Erro inesperado ao fazer login",
+        variant: "destructive"
       });
-      navigate('/dashboard');
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -55,15 +89,48 @@ const Index = () => {
       return;
     }
 
-    // Simular cadastro
-    setTimeout(() => {
+    if (formData.password.length < 6) {
       toast({
-        title: "Conta criada com sucesso!",
-        description: "Seu teste gratuito de 3 dias foi ativado!",
+        title: "Erro",
+        description: "A senha deve ter pelo menos 6 caracteres",
+        variant: "destructive"
       });
-      navigate('/dashboard');
       setIsLoading(false);
-    }, 1000);
+      return;
+    }
+
+    try {
+      const { error } = await signUp(formData.email, formData.password);
+      
+      if (error) {
+        if (error.message === 'User already registered') {
+          toast({
+            title: "Erro",
+            description: "Este e-mail já está cadastrado. Tente fazer login.",
+            variant: "destructive"
+          });
+        } else {
+          toast({
+            title: "Erro",
+            description: error.message || "Erro ao criar conta",
+            variant: "destructive"
+          });
+        }
+      } else {
+        toast({
+          title: "Conta criada com sucesso!",
+          description: "Verifique seu e-mail para confirmar a conta.",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Erro inesperado ao criar conta",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const benefits = [
@@ -81,11 +148,6 @@ const Index = () => {
       icon: PieChart,
       title: "Gráficos de movimentações mensais",
       description: "Analise suas finanças com gráficos intuitivos"
-    },
-    {
-      icon: Users,
-      title: "Cadastro de clientes e fornecedores",
-      description: "Organize seus contatos comerciais"
     },
     {
       icon: FileText,
@@ -201,11 +263,12 @@ const Index = () => {
                       <Input
                         id="password"
                         type="password"
-                        placeholder="Sua senha"
+                        placeholder="Mínimo 6 caracteres"
                         value={formData.password}
                         onChange={(e) => setFormData({...formData, password: e.target.value})}
                         required
                         className="mei-input"
+                        minLength={6}
                       />
                     </div>
                     <div>
