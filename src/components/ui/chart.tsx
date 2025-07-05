@@ -1,3 +1,4 @@
+
 import * as React from "react"
 import * as RechartsPrimitive from "recharts"
 import { TooltipProps } from "recharts"
@@ -102,6 +103,7 @@ ${colorConfig
 const ChartTooltip = RechartsPrimitive.Tooltip
 
 interface ChartTooltipContentProps extends TooltipProps<number, string> {
+  className?: string
   hideLabel?: boolean
   hideIndicator?: boolean
   indicator?: "line" | "dot" | "dashed"
