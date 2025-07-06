@@ -101,9 +101,13 @@ const Layout = ({ children }: LayoutProps) => {
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200">
-          <h1 className="text-xl font-bold">
-            <span className="text-mei-red">MEI</span> Finance
-          </h1>
+          <div className="flex items-center space-x-2">
+            <img 
+              src="/lovable-uploads/df4ec87a-f5c9-4334-a247-0a1947d73246.png" 
+              alt="MEI Finance" 
+              className="h-8 w-auto"
+            />
+          </div>
           <Button
             variant="ghost"
             size="sm"

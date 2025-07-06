@@ -210,6 +210,117 @@ export const useAdmin = () => {
     }
   };
 
+  const criarUsuarioManualmente = async (nome: string, email: string, senha: string, plano: string) => {
+    try {
+      // Criar usuário no Supabase Auth
+      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+        email,
+        password: senha,
+        email_confirm: true
+      });
+
+      if (authError) throw authError;
+
+      // Criar assinatura para o usuário
+      const { error: assinaturaError } = await supabase
+        .from('assinaturas')
+        .insert({
+          user_id: authData.user.id,
+          status: plano,
+          plano: plano
+        });
+
+      if (assinaturaError) throw assinaturaError;
+
+      // Se for plano liberado, adicionar na tabela usuarios_liberados
+      if (plano === 'liberado') {
+        const { error: liberadoError } = await supabase
+          .from('usuarios_liberados')
+          .insert({
+            user_id: authData.user.id,
+            liberado: true,
+            liberado_por: user?.id,
+            motivo: 'Criado manualmente pelo administrador'
+          });
+
+        if (liberadoError) throw liberadoError;
+      }
+
+      toast({
+        title: "Sucesso!",
+        description: "Usuário criado com sucesso"
+      });
+
+      await fetchMetrics();
+    } catch (error) {
+      console.error('Erro ao criar usuário:', error);
+      toast({
+        title: "Erro",
+        description: "Erro ao criar usuário",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const verificarCodigoParceria = async (codigo: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('codigos_parceria')
+        .select('*')
+        .eq('codigo', codigo)
+        .eq('ativo', true)
+        .single();
+
+      if (error || !data) {
+        return { valido: false, erro: 'Código inválido ou inativo' };
+      }
+
+      // Verificar se excedeu o uso máximo
+      if (data.uso_maximo && data.uso_atual >= data.uso_maximo) {
+        return { valido: false, erro: 'Código esgotado' };
+      }
+
+      return { valido: true, codigo: data };
+    } catch (error) {
+      console.error('Erro ao verificar código:', error);
+      return { valido: false, erro: 'Erro ao verificar código' };
+    }
+  };
+
+  const ativarCodigoParceria = async (userId: string, codigo: string) => {
+    try {
+      // Verificar o código
+      const verificacao = await verificarCodigoParceria(codigo);
+      if (!verificacao.valido) {
+        throw new Error(verificacao.erro);
+      }
+
+      // Registrar parceria ativa
+      const { error: parceiraError } = await supabase
+        .from('parcerias_ativas')
+        .insert({
+          user_id: userId,
+          codigo_id: verificacao.codigo.id,
+          codigo_usado: codigo
+        });
+
+      if (parceiraError) throw parceiraError;
+
+      // Atualizar contador de uso do código
+      const { error: updateError } = await supabase
+        .from('codigos_parceria')
+        .update({ uso_atual: (verificacao.codigo.uso_atual || 0) + 1 })
+        .eq('id', verificacao.codigo.id);
+
+      if (updateError) throw updateError;
+
+      return { sucesso: true };
+    } catch (error) {
+      console.error('Erro ao ativar código:', error);
+      return { sucesso: false, erro: error.message };
+    }
+  };
+
   return {
     isAdmin,
     loading,
@@ -217,6 +328,9 @@ export const useAdmin = () => {
     liberarUsuario,
     revogarUsuario,
     criarCodigoParceria,
+    criarUsuarioManualmente,
+    verificarCodigoParceria,
+    ativarCodigoParceria,
     refetchMetrics: fetchMetrics
   };
 };
