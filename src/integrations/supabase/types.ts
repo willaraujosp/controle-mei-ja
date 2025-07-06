@@ -9,6 +9,36 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      assinaturas: {
+        Row: {
+          created_at: string
+          data_fim: string | null
+          data_inicio: string
+          id: string
+          plano: string | null
+          status: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          data_fim?: string | null
+          data_inicio?: string
+          id?: string
+          plano?: string | null
+          status: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          data_fim?: string | null
+          data_inicio?: string
+          id?: string
+          plano?: string | null
+          status?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       clientes: {
         Row: {
           contato: string | null
@@ -32,6 +62,57 @@ export type Database = {
           id?: string
           nome?: string
           observacoes?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      codigos_parceria: {
+        Row: {
+          ativo: boolean
+          codigo: string
+          created_at: string
+          descricao: string | null
+          id: string
+          uso_atual: number | null
+          uso_maximo: number | null
+        }
+        Insert: {
+          ativo?: boolean
+          codigo: string
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          uso_atual?: number | null
+          uso_maximo?: number | null
+        }
+        Update: {
+          ativo?: boolean
+          codigo?: string
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          uso_atual?: number | null
+          uso_maximo?: number | null
+        }
+        Relationships: []
+      }
+      exportacoes_pdf: {
+        Row: {
+          data_exportacao: string
+          id: string
+          tipo_relatorio: string
+          user_id: string | null
+        }
+        Insert: {
+          data_exportacao?: string
+          id?: string
+          tipo_relatorio: string
+          user_id?: string | null
+        }
+        Update: {
+          data_exportacao?: string
+          id?: string
+          tipo_relatorio?: string
           user_id?: string | null
         }
         Relationships: []
@@ -96,6 +177,68 @@ export type Database = {
           tipo?: string
           user_id?: string | null
           valor?: number
+        }
+        Relationships: []
+      }
+      parcerias_ativas: {
+        Row: {
+          codigo_id: string | null
+          codigo_usado: string
+          data_ativacao: string
+          id: string
+          user_id: string | null
+        }
+        Insert: {
+          codigo_id?: string | null
+          codigo_usado: string
+          data_ativacao?: string
+          id?: string
+          user_id?: string | null
+        }
+        Update: {
+          codigo_id?: string | null
+          codigo_usado?: string
+          data_ativacao?: string
+          id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "parcerias_ativas_codigo_id_fkey"
+            columns: ["codigo_id"]
+            isOneToOne: false
+            referencedRelation: "codigos_parceria"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      usuarios_liberados: {
+        Row: {
+          created_at: string
+          data_liberacao: string | null
+          id: string
+          liberado: boolean
+          liberado_por: string | null
+          motivo: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          data_liberacao?: string | null
+          id?: string
+          liberado?: boolean
+          liberado_por?: string | null
+          motivo?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          data_liberacao?: string | null
+          id?: string
+          liberado?: boolean
+          liberado_por?: string | null
+          motivo?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }

@@ -9,7 +9,8 @@ import {
   Menu,
   X,
   LogOut,
-  CreditCard
+  CreditCard,
+  Shield
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
@@ -22,7 +23,7 @@ interface LayoutProps {
 const Layout = ({ children }: LayoutProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
-  const { signOut } = useAuth();
+  const { signOut, user } = useAuth();
 
   const menuItems = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -30,6 +31,11 @@ const Layout = ({ children }: LayoutProps) => {
     { name: 'Relatórios', href: '/relatorios', icon: FileText },
     { name: 'Configurações', href: '/configuracoes', icon: Settings }
   ];
+
+  // Adicionar item Admin apenas para o administrador principal
+  if (user?.email === 'wiaslan1999@gmail.com') {
+    menuItems.push({ name: 'Admin', href: '/admin', icon: Shield });
+  }
 
   const handleLogout = async () => {
     try {
@@ -159,9 +165,15 @@ const Layout = ({ children }: LayoutProps) => {
           <div className="hidden lg:block" />
           
           <div className="text-sm text-gray-600">
-            <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
-              Teste Gratuito Ativo
-            </span>
+            {user?.email === 'wiaslan1999@gmail.com' ? (
+              <span className="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-medium">
+                Administrador
+              </span>
+            ) : (
+              <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
+                Teste Gratuito Ativo
+              </span>
+            )}
           </div>
         </header>
 
