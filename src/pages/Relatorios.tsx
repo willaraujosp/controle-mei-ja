@@ -70,11 +70,11 @@ const Relatorios = () => {
       const doc = new jsPDF();
       
       // Configurar cores
-      const corPrincipal = [244, 32, 0]; // #F42000
-      const corTexto = [46, 46, 46]; // #2E2E2E
+      const corPrincipal = [244, 32, 0] as const; // #F42000
+      const corTexto = [46, 46, 46] as const; // #2E2E2E
       
       // Header
-      doc.setFillColor(...corPrincipal);
+      doc.setFillColor(corPrincipal[0], corPrincipal[1], corPrincipal[2]);
       doc.rect(0, 0, 210, 30, 'F');
       
       doc.setTextColor(255, 255, 255);
@@ -82,7 +82,7 @@ const Relatorios = () => {
       doc.text('MEI Finance - Relatório Financeiro', 20, 20);
       
       // Data do relatório
-      doc.setTextColor(...corTexto);
+      doc.setTextColor(corTexto[0], corTexto[1], corTexto[2]);
       doc.setFontSize(10);
       doc.text(`Gerado em: ${new Date().toLocaleDateString('pt-BR')}`, 20, 40);
       
@@ -111,7 +111,7 @@ const Relatorios = () => {
       doc.text(`Total de Saídas: ${formatCurrency(resumo.saidas)}`, 20, yPos);
       yPos += 8;
       
-      doc.setTextColor(...corTexto);
+      doc.setTextColor(corTexto[0], corTexto[1], corTexto[2]);
       doc.text(`Saldo Final: ${formatCurrency(resumo.saldo)}`, 20, yPos);
       yPos += 15;
       
@@ -152,7 +152,7 @@ const Relatorios = () => {
             doc.setTextColor(200, 0, 0);
           }
           doc.text(formatCurrency(Number(mov.valor)), 170, yPos);
-          doc.setTextColor(...corTexto);
+          doc.setTextColor(corTexto[0], corTexto[1], corTexto[2]);
           
           yPos += 6;
         });
