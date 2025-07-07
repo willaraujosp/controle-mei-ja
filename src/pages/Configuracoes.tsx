@@ -25,18 +25,31 @@ const Configuracoes = () => {
   const fetchProfile = async () => {
     try {
       setLoadingProfile(true);
-      const { data, error } = await supabase
+      
+      // Buscar perfil existente
+      const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('nome_empresa')
         .eq('user_id', user?.id)
         .single();
 
-      if (error && error.code !== 'PGRST116') {
-        throw error;
-      }
-
-      if (data) {
-        setNomeEmpresa(data.nome_empresa || '');
+      if (profileError && profileError.code !== 'PGRST116') {
+        console.error('Erro ao buscar perfil:', profileError);
+        // Se não existe perfil, criar um
+        if (profileError.code === 'PGRST116') {
+          const { error: createError } = await supabase
+            .from('profiles')
+            .insert({
+              user_id: user?.id!,
+              nome_empresa: ''
+            });
+          
+          if (createError) {
+            console.error('Erro ao criar perfil:', createError);
+          }
+        }
+      } else if (profileData) {
+        setNomeEmpresa(profileData.nome_empresa || '');
       }
     } catch (error) {
       console.error('Erro ao buscar perfil:', error);

@@ -217,6 +217,30 @@ export type Database = {
           },
         ]
       }
+      profiles: {
+        Row: {
+          created_at: string
+          id: string
+          nome_empresa: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          nome_empresa?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          nome_empresa?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       usuarios_liberados: {
         Row: {
           created_at: string
