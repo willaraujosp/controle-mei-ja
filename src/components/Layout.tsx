@@ -15,6 +15,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
+import Chatbot from '@/components/Chatbot';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -54,20 +55,20 @@ const Layout = ({ children }: LayoutProps) => {
 
   if (isTrialExpired) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-mei-gray to-white flex items-center justify-center">
-        <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full mx-4">
+      <div className="min-h-screen bg-gradient-to-br from-mei-gray to-white flex items-center justify-center px-4">
+        <div className="bg-white rounded-lg shadow-lg p-6 sm:p-8 max-w-md w-full">
           <div className="text-center">
             <CreditCard className="h-16 w-16 text-mei-red mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-mei-text mb-4">
+            <h2 className="text-xl sm:text-2xl font-bold text-mei-text mb-4">
               Teste Gratuito Expirado
             </h2>
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-600 mb-6 text-sm sm:text-base">
               Seu período de teste de 3 dias expirou. Para continuar usando o MEI Finance, 
               assine nosso plano por apenas R$ 29,90/mês.
             </p>
             <Button
               onClick={() => window.open('https://pay.cakto.com.br/3f9sct4_464768', '_blank')}
-              className="w-full mei-button text-lg py-6 mb-4"
+              className="w-full mei-button text-base sm:text-lg py-4 sm:py-6 mb-4"
             >
               Assinar por R$ 29,90/mês
             </Button>
@@ -85,7 +86,7 @@ const Layout = ({ children }: LayoutProps) => {
   }
 
   return (
-    <div className="flex h-screen bg-mei-gray">
+    <div className="flex h-screen bg-mei-gray overflow-hidden max-w-[100vw]">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div 
@@ -118,7 +119,7 @@ const Layout = ({ children }: LayoutProps) => {
           </Button>
         </div>
 
-        <nav className="flex-1 px-4 py-6 space-y-2">
+        <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
           {menuItems.map((item) => {
             const isActive = location.pathname === item.href;
             return (
@@ -134,8 +135,8 @@ const Layout = ({ children }: LayoutProps) => {
                 `}
                 onClick={() => setSidebarOpen(false)}
               >
-                <item.icon className="mr-3 h-5 w-5" />
-                {item.name}
+                <item.icon className="mr-3 h-5 w-5 flex-shrink-0" />
+                <span className="truncate">{item.name}</span>
               </Link>
             );
           })}
@@ -147,8 +148,8 @@ const Layout = ({ children }: LayoutProps) => {
             onClick={handleLogout}
             className="w-full justify-start text-gray-600 hover:text-mei-red"
           >
-            <LogOut className="mr-3 h-5 w-5" />
-            Sair
+            <LogOut className="mr-3 h-5 w-5 flex-shrink-0" />
+            <span className="truncate">Sair</span>
           </Button>
         </div>
       </div>
@@ -156,7 +157,7 @@ const Layout = ({ children }: LayoutProps) => {
       {/* Main content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Top bar */}
-        <header className="bg-white shadow-sm border-b border-gray-200 h-16 flex items-center justify-between px-6">
+        <header className="bg-white shadow-sm border-b border-gray-200 h-16 flex items-center justify-between px-4 sm:px-6">
           <Button
             variant="ghost"
             size="sm"
@@ -168,7 +169,7 @@ const Layout = ({ children }: LayoutProps) => {
           
           <div className="hidden lg:block" />
           
-          <div className="text-sm text-gray-600">
+          <div className="text-xs sm:text-sm text-gray-600">
             {user?.email === 'wiaslan1999@gmail.com' ? (
               <span className="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-medium">
                 Administrador
@@ -182,10 +183,15 @@ const Layout = ({ children }: LayoutProps) => {
         </header>
 
         {/* Page content */}
-        <main className="flex-1 overflow-auto p-6">
-          {children}
+        <main className="flex-1 overflow-auto">
+          <div className="h-full max-w-full">
+            {children}
+          </div>
         </main>
       </div>
+
+      {/* Chatbot */}
+      <Chatbot />
     </div>
   );
 };
