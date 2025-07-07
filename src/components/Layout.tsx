@@ -10,7 +10,8 @@ import {
   X,
   LogOut,
   CreditCard,
-  Shield
+  Shield,
+  HelpCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
@@ -33,7 +34,6 @@ const Layout = ({ children }: LayoutProps) => {
     { name: 'Configurações', href: '/configuracoes', icon: Settings }
   ];
 
-  // Adicionar item Admin apenas para o administrador principal
   if (user?.email === 'wiaslan1999@gmail.com') {
     menuItems.push({ name: 'Admin', href: '/admin', icon: Shield });
   }
@@ -50,16 +50,15 @@ const Layout = ({ children }: LayoutProps) => {
     }
   };
 
-  // Simular expiração do teste (3 dias)
-  const isTrialExpired = false; // Mude para true para testar
+  const isTrialExpired = false;
 
   if (isTrialExpired) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-mei-gray to-white flex items-center justify-center px-4 overflow-x-hidden max-w-full">
-        <div className="bg-white rounded-lg shadow-lg p-6 sm:p-8 max-w-md w-full">
+      <div className="min-h-screen bg-gradient-to-br from-mei-gray to-white flex items-center justify-center px-2 sm:px-4 overflow-x-hidden w-full">
+        <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 md:p-8 max-w-md w-full mx-2">
           <div className="text-center">
-            <CreditCard className="h-16 w-16 text-mei-red mx-auto mb-4" />
-            <h2 className="text-xl sm:text-2xl font-bold text-mei-text mb-4">
+            <CreditCard className="h-12 w-12 sm:h-16 sm:w-16 text-mei-red mx-auto mb-4" />
+            <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-mei-text mb-4">
               Teste Gratuito Expirado
             </h2>
             <p className="text-gray-600 mb-6 text-sm sm:text-base break-words">
@@ -68,7 +67,7 @@ const Layout = ({ children }: LayoutProps) => {
             </p>
             <Button
               onClick={() => window.open('https://pay.cakto.com.br/3f9sct4_464768', '_blank')}
-              className="w-full mei-button text-base sm:text-lg py-4 sm:py-6 mb-4"
+              className="w-full mei-button text-sm sm:text-base md:text-lg py-3 sm:py-4 md:py-6 mb-4"
             >
               Assinar por R$ 29,90/mês
             </Button>
@@ -86,7 +85,7 @@ const Layout = ({ children }: LayoutProps) => {
   }
 
   return (
-    <div className="flex h-screen bg-mei-gray overflow-hidden max-w-full">
+    <div className="flex h-screen bg-mei-gray overflow-hidden w-full">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div 
@@ -101,21 +100,21 @@ const Layout = ({ children }: LayoutProps) => {
         lg:translate-x-0 lg:static lg:inset-0
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
-        <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200">
-          <div className="flex items-center space-x-2">
-            <h1 className="text-xl font-bold text-mei-red">MEI Finance</h1>
+        <div className="flex items-center justify-between h-16 px-4 sm:px-6 border-b border-gray-200">
+          <div className="flex items-center space-x-2 min-w-0">
+            <h1 className="text-lg sm:text-xl font-bold text-mei-red truncate">MEI Finance</h1>
           </div>
           <Button
             variant="ghost"
             size="sm"
-            className="lg:hidden"
+            className="lg:hidden flex-shrink-0"
             onClick={() => setSidebarOpen(false)}
           >
             <X className="h-5 w-5" />
           </Button>
         </div>
 
-        <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+        <nav className="flex-1 px-2 sm:px-4 py-4 sm:py-6 space-y-1 sm:space-y-2 overflow-y-auto">
           {menuItems.map((item) => {
             const isActive = location.pathname === item.href;
             return (
@@ -123,7 +122,7 @@ const Layout = ({ children }: LayoutProps) => {
                 key={item.name}
                 to={item.href}
                 className={`
-                  flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors break-words
+                  flex items-center px-3 sm:px-4 py-2 sm:py-3 text-sm font-medium rounded-lg transition-colors break-words
                   ${isActive 
                     ? 'bg-mei-red text-white' 
                     : 'text-gray-600 hover:bg-gray-100'
@@ -131,29 +130,43 @@ const Layout = ({ children }: LayoutProps) => {
                 `}
                 onClick={() => setSidebarOpen(false)}
               >
-                <item.icon className="mr-3 h-5 w-5 flex-shrink-0" />
-                <span className="truncate">{item.name}</span>
+                <item.icon className="mr-2 sm:mr-3 h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+                <span className="truncate text-xs sm:text-sm">{item.name}</span>
               </Link>
             );
           })}
         </nav>
 
-        <div className="p-4 border-t border-gray-200">
+        {/* Support Section */}
+        <div className="px-2 sm:px-4 py-2 border-t border-gray-200">
+          <div className="flex items-center space-x-2 text-xs sm:text-sm text-gray-600 mb-2">
+            <HelpCircle className="h-4 w-4 flex-shrink-0" />
+            <span className="truncate">Precisa de ajuda?</span>
+          </div>
+          <a 
+            href="mailto:meifinancebr@gmail.com"
+            className="text-xs text-mei-red hover:underline break-all block mb-3"
+          >
+            meifinancebr@gmail.com
+          </a>
+        </div>
+
+        <div className="p-2 sm:p-4 border-t border-gray-200">
           <Button
             variant="outline"
             onClick={handleLogout}
-            className="w-full justify-start text-gray-600 hover:text-mei-red"
+            className="w-full justify-start text-gray-600 hover:text-mei-red text-xs sm:text-sm"
           >
-            <LogOut className="mr-3 h-5 w-5 flex-shrink-0" />
+            <LogOut className="mr-2 sm:mr-3 h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
             <span className="truncate">Sair</span>
           </Button>
         </div>
       </div>
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col overflow-hidden max-w-full">
+      <div className="flex-1 flex flex-col overflow-hidden w-full max-w-full">
         {/* Top bar */}
-        <header className="bg-white shadow-sm border-b border-gray-200 h-16 flex items-center justify-between px-4 sm:px-6 overflow-x-hidden max-w-full">
+        <header className="bg-white shadow-sm border-b border-gray-200 h-14 sm:h-16 flex items-center justify-between px-2 sm:px-4 md:px-6 overflow-x-hidden w-full">
           <Button
             variant="ghost"
             size="sm"
@@ -167,11 +180,11 @@ const Layout = ({ children }: LayoutProps) => {
           
           <div className="text-xs sm:text-sm text-gray-600">
             {user?.email === 'wiaslan1999@gmail.com' ? (
-              <span className="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-medium">
+              <span className="bg-red-100 text-red-800 px-1 sm:px-2 py-1 rounded-full text-xs font-medium">
                 Administrador
               </span>
             ) : (
-              <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
+              <span className="bg-green-100 text-green-800 px-1 sm:px-2 py-1 rounded-full text-xs font-medium">
                 Teste Gratuito Ativo
               </span>
             )}
@@ -179,8 +192,8 @@ const Layout = ({ children }: LayoutProps) => {
         </header>
 
         {/* Page content */}
-        <main className="flex-1 overflow-auto max-w-full">
-          <div className="h-full max-w-full overflow-x-hidden">
+        <main className="flex-1 overflow-auto w-full max-w-full">
+          <div className="h-full w-full max-w-full overflow-x-hidden">
             {children}
           </div>
         </main>

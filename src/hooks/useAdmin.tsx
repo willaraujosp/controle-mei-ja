@@ -43,7 +43,6 @@ export const useAdmin = () => {
       return;
     }
 
-    // Verificar se é o admin principal
     const isMainAdmin = user.email === 'wiaslan1999@gmail.com';
     setIsAdmin(isMainAdmin);
     setLoading(false);
@@ -55,9 +54,9 @@ export const useAdmin = () => {
 
   const fetchMetrics = async () => {
     try {
-      console.log('Buscando métricas...');
+      console.log('Buscando métricas administrativas...');
 
-      // Buscar perfis para contar usuários totais
+      // Buscar total de usuários através dos profiles
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
         .select('*');
@@ -69,7 +68,7 @@ export const useAdmin = () => {
       // Buscar assinaturas por status
       const { data: assinaturas, error: assinaturasError } = await supabase
         .from('assinaturas')
-        .select('status, plano, user_id');
+        .select('*');
 
       if (assinaturasError) {
         console.error('Erro ao buscar assinaturas:', assinaturasError);
@@ -122,12 +121,12 @@ export const useAdmin = () => {
         console.error('Erro ao buscar códigos:', codigosError);
       }
 
-      // Buscar usuários para gerenciar (combinando dados)
+      // Buscar usuários para gerenciar
       const { data: usuariosParaGerenciar, error: usuariosError } = await supabase
-        .from('usuarios_liberados')
+        .from('profiles')
         .select(`
           *,
-          assinaturas (status, plano)
+          usuarios_liberados!inner (*)
         `)
         .order('created_at', { ascending: false });
 
@@ -137,8 +136,16 @@ export const useAdmin = () => {
 
       // Calcular métricas
       const totalUsuarios = profiles?.length || 0;
-      const usuariosTesteGratuito = assinaturas?.filter(a => a.status === 'teste_gratuito').length || 0;
-      const usuariosPremium = assinaturas?.filter(a => a.status === 'premium').length || 0;
+      
+      // Contar por status de assinatura
+      const usuariosTesteGratuito = assinaturas?.filter(
+        a => a.status === 'teste_gratuito' || a.status === 'ativo'
+      ).length || 0;
+      
+      const usuariosPremium = assinaturas?.filter(
+        a => a.status === 'premium' || a.status === 'pago'
+      ).length || 0;
+      
       const usuariosLiberados = usuariosLiberadosData?.length || 0;
       const usuariosParcerias = parcerias?.length || 0;
       const totalMovimentacoes = movimentacoes?.length || 0;
@@ -272,7 +279,6 @@ export const useAdmin = () => {
         return { valido: false, erro: 'Código inválido ou inativo' };
       }
 
-      // Verificar se excedeu o uso máximo
       if (data.uso_maximo && data.uso_atual >= data.uso_maximo) {
         return { valido: false, erro: 'Código esgotado' };
       }
@@ -286,13 +292,11 @@ export const useAdmin = () => {
 
   const ativarCodigoParceria = async (userId: string, codigo: string) => {
     try {
-      // Verificar o código
       const verificacao = await verificarCodigoParceria(codigo);
       if (!verificacao.valido) {
         throw new Error(verificacao.erro);
       }
 
-      // Registrar parceria ativa
       const { error: parceiraError } = await supabase
         .from('parcerias_ativas')
         .insert({
@@ -303,7 +307,6 @@ export const useAdmin = () => {
 
       if (parceiraError) throw parceiraError;
 
-      // Atualizar contador de uso do código
       const { error: updateError } = await supabase
         .from('codigos_parceria')
         .update({ uso_atual: (verificacao.codigo.uso_atual || 0) + 1 })

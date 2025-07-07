@@ -19,6 +19,25 @@
     
     <!-- Favicons -->
     <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
+    
+    <style>
+      /* Prevenir zoom horizontal em dispositivos móveis */
+      html, body {
+        max-width: 100vw;
+        overflow-x: hidden;
+      }
+      
+      /* Garantir que textos não quebrem o layout */
+      * {
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+      }
+      
+      /* Prevenir scrolling horizontal em elementos flex */
+      .flex {
+        min-width: 0;
+      }
+    </style>
   </head>
 
   <body>
