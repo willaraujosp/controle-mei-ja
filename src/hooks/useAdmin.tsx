@@ -55,45 +55,75 @@ export const useAdmin = () => {
 
   const fetchMetrics = async () => {
     try {
-      // Buscar total de usuários
-      const { count: totalUsuarios } = await supabase
-        .from('usuarios_liberados')
-        .select('*', { count: 'exact', head: true });
+      console.log('Buscando métricas...');
+
+      // Buscar perfis para contar usuários totais
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('*');
+      
+      if (profilesError) {
+        console.error('Erro ao buscar profiles:', profilesError);
+      }
 
       // Buscar assinaturas por status
-      const { data: assinaturas } = await supabase
+      const { data: assinaturas, error: assinaturasError } = await supabase
         .from('assinaturas')
-        .select('status');
+        .select('status, plano, user_id');
+
+      if (assinaturasError) {
+        console.error('Erro ao buscar assinaturas:', assinaturasError);
+      }
 
       // Buscar usuários liberados
-      const { count: usuariosLiberados } = await supabase
+      const { data: usuariosLiberadosData, error: liberadosError } = await supabase
         .from('usuarios_liberados')
-        .select('*', { count: 'exact', head: true })
+        .select('*')
         .eq('liberado', true);
 
+      if (liberadosError) {
+        console.error('Erro ao buscar usuários liberados:', liberadosError);
+      }
+
       // Buscar parcerias ativas
-      const { count: usuariosParcerias } = await supabase
+      const { data: parcerias, error: parceriasError } = await supabase
         .from('parcerias_ativas')
-        .select('*', { count: 'exact', head: true });
+        .select('*');
+
+      if (parceriasError) {
+        console.error('Erro ao buscar parcerias:', parceriasError);
+      }
 
       // Buscar total de movimentações
-      const { count: totalMovimentacoes } = await supabase
+      const { data: movimentacoes, error: movError } = await supabase
         .from('movimentacoes')
-        .select('*', { count: 'exact', head: true });
+        .select('*');
+
+      if (movError) {
+        console.error('Erro ao buscar movimentações:', movError);
+      }
 
       // Buscar total de exportações PDF
-      const { count: totalExportacoesPDF } = await supabase
+      const { data: exportacoes, error: expError } = await supabase
         .from('exportacoes_pdf')
-        .select('*', { count: 'exact', head: true });
+        .select('*');
+
+      if (expError) {
+        console.error('Erro ao buscar exportações:', expError);
+      }
 
       // Buscar códigos de parceria
-      const { data: codigosParcerias } = await supabase
+      const { data: codigosParcerias, error: codigosError } = await supabase
         .from('codigos_parceria')
         .select('*')
         .order('created_at', { ascending: false });
 
-      // Buscar usuários para gerenciar
-      const { data: usuariosParaGerenciar } = await supabase
+      if (codigosError) {
+        console.error('Erro ao buscar códigos:', codigosError);
+      }
+
+      // Buscar usuários para gerenciar (combinando dados)
+      const { data: usuariosParaGerenciar, error: usuariosError } = await supabase
         .from('usuarios_liberados')
         .select(`
           *,
@@ -101,18 +131,37 @@ export const useAdmin = () => {
         `)
         .order('created_at', { ascending: false });
 
-      // Calcular métricas das assinaturas
+      if (usuariosError) {
+        console.error('Erro ao buscar usuários para gerenciar:', usuariosError);
+      }
+
+      // Calcular métricas
+      const totalUsuarios = profiles?.length || 0;
       const usuariosTesteGratuito = assinaturas?.filter(a => a.status === 'teste_gratuito').length || 0;
       const usuariosPremium = assinaturas?.filter(a => a.status === 'premium').length || 0;
+      const usuariosLiberados = usuariosLiberadosData?.length || 0;
+      const usuariosParcerias = parcerias?.length || 0;
+      const totalMovimentacoes = movimentacoes?.length || 0;
+      const totalExportacoesPDF = exportacoes?.length || 0;
 
-      setMetrics({
-        totalUsuarios: totalUsuarios || 0,
+      console.log('Métricas calculadas:', {
+        totalUsuarios,
         usuariosTesteGratuito,
         usuariosPremium,
-        usuariosLiberados: usuariosLiberados || 0,
-        usuariosParcerias: usuariosParcerias || 0,
-        totalMovimentacoes: totalMovimentacoes || 0,
-        totalExportacoesPDF: totalExportacoesPDF || 0,
+        usuariosLiberados,
+        usuariosParcerias,
+        totalMovimentacoes,
+        totalExportacoesPDF
+      });
+
+      setMetrics({
+        totalUsuarios,
+        usuariosTesteGratuito,
+        usuariosPremium,
+        usuariosLiberados,
+        usuariosParcerias,
+        totalMovimentacoes,
+        totalExportacoesPDF,
         codigosParcerias: codigosParcerias || [],
         usuariosParaGerenciar: usuariosParaGerenciar || []
       });
@@ -210,58 +259,6 @@ export const useAdmin = () => {
     }
   };
 
-  const criarUsuarioManualmente = async (nome: string, email: string, senha: string, plano: string) => {
-    try {
-      // Criar usuário no Supabase Auth
-      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-        email,
-        password: senha,
-        email_confirm: true
-      });
-
-      if (authError) throw authError;
-
-      // Criar assinatura para o usuário
-      const { error: assinaturaError } = await supabase
-        .from('assinaturas')
-        .insert({
-          user_id: authData.user.id,
-          status: plano,
-          plano: plano
-        });
-
-      if (assinaturaError) throw assinaturaError;
-
-      // Se for plano liberado, adicionar na tabela usuarios_liberados
-      if (plano === 'liberado') {
-        const { error: liberadoError } = await supabase
-          .from('usuarios_liberados')
-          .insert({
-            user_id: authData.user.id,
-            liberado: true,
-            liberado_por: user?.id,
-            motivo: 'Criado manualmente pelo administrador'
-          });
-
-        if (liberadoError) throw liberadoError;
-      }
-
-      toast({
-        title: "Sucesso!",
-        description: "Usuário criado com sucesso"
-      });
-
-      await fetchMetrics();
-    } catch (error) {
-      console.error('Erro ao criar usuário:', error);
-      toast({
-        title: "Erro",
-        description: "Erro ao criar usuário",
-        variant: "destructive"
-      });
-    }
-  };
-
   const verificarCodigoParceria = async (codigo: string) => {
     try {
       const { data, error } = await supabase
@@ -328,7 +325,6 @@ export const useAdmin = () => {
     liberarUsuario,
     revogarUsuario,
     criarCodigoParceria,
-    criarUsuarioManualmente,
     verificarCodigoParceria,
     ativarCodigoParceria,
     refetchMetrics: fetchMetrics

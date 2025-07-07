@@ -55,14 +55,14 @@ const Layout = ({ children }: LayoutProps) => {
 
   if (isTrialExpired) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-mei-gray to-white flex items-center justify-center px-4">
+      <div className="min-h-screen bg-gradient-to-br from-mei-gray to-white flex items-center justify-center px-4 overflow-x-hidden max-w-full">
         <div className="bg-white rounded-lg shadow-lg p-6 sm:p-8 max-w-md w-full">
           <div className="text-center">
             <CreditCard className="h-16 w-16 text-mei-red mx-auto mb-4" />
             <h2 className="text-xl sm:text-2xl font-bold text-mei-text mb-4">
               Teste Gratuito Expirado
             </h2>
-            <p className="text-gray-600 mb-6 text-sm sm:text-base">
+            <p className="text-gray-600 mb-6 text-sm sm:text-base break-words">
               Seu período de teste de 3 dias expirou. Para continuar usando o MEI Finance, 
               assine nosso plano por apenas R$ 29,90/mês.
             </p>
@@ -86,7 +86,7 @@ const Layout = ({ children }: LayoutProps) => {
   }
 
   return (
-    <div className="flex h-screen bg-mei-gray overflow-hidden max-w-[100vw]">
+    <div className="flex h-screen bg-mei-gray overflow-hidden max-w-full">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div 
@@ -103,11 +103,7 @@ const Layout = ({ children }: LayoutProps) => {
       `}>
         <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200">
           <div className="flex items-center space-x-2">
-            <img 
-              src="/lovable-uploads/df4ec87a-f5c9-4334-a247-0a1947d73246.png" 
-              alt="MEI Finance" 
-              className="h-8 w-auto"
-            />
+            <h1 className="text-xl font-bold text-mei-red">MEI Finance</h1>
           </div>
           <Button
             variant="ghost"
@@ -127,7 +123,7 @@ const Layout = ({ children }: LayoutProps) => {
                 key={item.name}
                 to={item.href}
                 className={`
-                  flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors
+                  flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors break-words
                   ${isActive 
                     ? 'bg-mei-red text-white' 
                     : 'text-gray-600 hover:bg-gray-100'
@@ -155,9 +151,9 @@ const Layout = ({ children }: LayoutProps) => {
       </div>
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden max-w-full">
         {/* Top bar */}
-        <header className="bg-white shadow-sm border-b border-gray-200 h-16 flex items-center justify-between px-4 sm:px-6">
+        <header className="bg-white shadow-sm border-b border-gray-200 h-16 flex items-center justify-between px-4 sm:px-6 overflow-x-hidden max-w-full">
           <Button
             variant="ghost"
             size="sm"
@@ -183,8 +179,8 @@ const Layout = ({ children }: LayoutProps) => {
         </header>
 
         {/* Page content */}
-        <main className="flex-1 overflow-auto">
-          <div className="h-full max-w-full">
+        <main className="flex-1 overflow-auto max-w-full">
+          <div className="h-full max-w-full overflow-x-hidden">
             {children}
           </div>
         </main>

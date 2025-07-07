@@ -162,14 +162,14 @@ const Index = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-mei-gray to-white">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-mei-gray to-white overflow-x-hidden max-w-full">
+      <div className="container mx-auto px-4 py-8 max-w-full">
         {/* Header */}
         <header className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-mei-text mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold text-mei-text mb-4 break-words">
             <span className="text-mei-red">MEI</span> Finance
           </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto break-words">
             A solução completa para microempreendedores individuais organizarem suas finanças
           </p>
         </header>
@@ -180,10 +180,10 @@ const Index = () => {
           {/* Left Side - Benefits */}
           <div className="space-y-8">
             <div className="space-y-6">
-              <h2 className="text-3xl font-bold text-mei-text">
+              <h2 className="text-3xl font-bold text-mei-text break-words">
                 Organize suas finanças com facilidade
               </h2>
-              <p className="text-lg text-gray-600">
+              <p className="text-lg text-gray-600 break-words">
                 Tudo que você precisa para controlar as finanças do seu negócio em uma única plataforma.
               </p>
             </div>
@@ -197,11 +197,11 @@ const Index = () => {
                   <div className="flex-shrink-0">
                     <benefit.icon className="h-6 w-6 text-mei-red" />
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-mei-text mb-1">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-mei-text mb-1 break-words">
                       {benefit.title}
                     </h3>
-                    <p className="text-gray-600 text-sm">
+                    <p className="text-gray-600 text-sm break-words">
                       {benefit.description}
                     </p>
                   </div>
@@ -213,13 +213,13 @@ const Index = () => {
             <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
               <div className="flex items-center space-x-2 mb-4">
                 <CheckCircle className="h-5 w-5 text-green-500" />
-                <span className="font-semibold text-mei-text">Teste grátis por 3 dias</span>
+                <span className="font-semibold text-mei-text break-words">Teste grátis por 3 dias</span>
               </div>
               <div className="text-center">
                 <div className="text-3xl font-bold text-mei-red mb-2">
                   R$ 29,90<span className="text-lg text-gray-500">/mês</span>
                 </div>
-                <p className="text-gray-600">
+                <p className="text-gray-600 break-words">
                   Depois do período de teste
                 </p>
               </div>
@@ -227,8 +227,8 @@ const Index = () => {
           </div>
 
           {/* Right Side - Login/Register Form */}
-          <div className="lg:sticky lg:top-8">
-            <Card className="p-8 shadow-lg border-0 bg-white/95 backdrop-blur">
+          <div className="lg:sticky lg:top-8 w-full">
+            <Card className="p-8 shadow-lg border-0 bg-white/95 backdrop-blur w-full max-w-full">
               <Tabs defaultValue="register" className="w-full">
                 <TabsList className="grid w-full grid-cols-2 mb-6">
                   <TabsTrigger value="register">Criar Conta</TabsTrigger>
@@ -237,10 +237,10 @@ const Index = () => {
 
                 <TabsContent value="register" className="space-y-4">
                   <div className="text-center mb-6">
-                    <h3 className="text-2xl font-bold text-mei-text mb-2">
+                    <h3 className="text-2xl font-bold text-mei-text mb-2 break-words">
                       Começar Teste Grátis
                     </h3>
-                    <p className="text-gray-600">
+                    <p className="text-gray-600 break-words">
                       3 dias grátis, depois apenas R$ 29,90/mês
                     </p>
                   </div>
@@ -255,7 +255,7 @@ const Index = () => {
                         value={formData.email}
                         onChange={(e) => setFormData({...formData, email: e.target.value})}
                         required
-                        className="mei-input"
+                        className="mei-input w-full"
                       />
                     </div>
                     <div>
@@ -267,7 +267,7 @@ const Index = () => {
                         value={formData.password}
                         onChange={(e) => setFormData({...formData, password: e.target.value})}
                         required
-                        className="mei-input"
+                        className="mei-input w-full"
                         minLength={6}
                       />
                     </div>
@@ -280,12 +280,12 @@ const Index = () => {
                         value={formData.confirmPassword}
                         onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
                         required
-                        className="mei-input"
+                        className="mei-input w-full"
                       />
                     </div>
                     <Button
                       type="submit"
-                      className="w-full mei-button text-lg py-6"
+                      className="w-full mei-button text-lg py-6 break-words"
                       disabled={isLoading}
                     >
                       {isLoading ? "Criando conta..." : "Criar Conta e Começar o Teste Grátis"}
@@ -296,10 +296,10 @@ const Index = () => {
 
                 <TabsContent value="login" className="space-y-4">
                   <div className="text-center mb-6">
-                    <h3 className="text-2xl font-bold text-mei-text mb-2">
+                    <h3 className="text-2xl font-bold text-mei-text mb-2 break-words">
                       Bem-vindo de volta!
                     </h3>
-                    <p className="text-gray-600">
+                    <p className="text-gray-600 break-words">
                       Entre na sua conta
                     </p>
                   </div>
@@ -314,7 +314,7 @@ const Index = () => {
                         value={formData.email}
                         onChange={(e) => setFormData({...formData, email: e.target.value})}
                         required
-                        className="mei-input"
+                        className="mei-input w-full"
                       />
                     </div>
                     <div>
@@ -326,12 +326,12 @@ const Index = () => {
                         value={formData.password}
                         onChange={(e) => setFormData({...formData, password: e.target.value})}
                         required
-                        className="mei-input"
+                        className="mei-input w-full"
                       />
                     </div>
                     <Button
                       type="submit"
-                      className="w-full mei-button text-lg py-6"
+                      className="w-full mei-button text-lg py-6 break-words"
                       disabled={isLoading}
                     >
                       {isLoading ? "Entrando..." : "Entrar"}

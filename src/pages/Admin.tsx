@@ -21,9 +21,10 @@ import Layout from '@/components/Layout';
 import MetricCard from '@/components/MetricCard';
 import { useAdmin } from '@/hooks/useAdmin';
 import { toast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 const Admin = () => {
-  const { metrics, liberarUsuario, revogarUsuario, criarCodigoParceria, criarUsuarioManualmente } = useAdmin();
+  const { metrics, liberarUsuario, revogarUsuario, criarCodigoParceria } = useAdmin();
   const [novoCodigo, setNovoCodigo] = useState('');
   const [descricaoCodigo, setDescricaoCodigo] = useState('');
   const [usoMaximo, setUsoMaximo] = useState<number | undefined>();
@@ -35,6 +36,7 @@ const Admin = () => {
     senha: '',
     plano: 'teste_gratuito'
   });
+  const [criandoUsuario, setCriandoUsuario] = useState(false);
 
   const handleCriarCodigo = async () => {
     if (!novoCodigo.trim()) {
@@ -62,13 +64,63 @@ const Admin = () => {
       return;
     }
 
-    await criarUsuarioManualmente(novoUsuario.nome, novoUsuario.email, novoUsuario.senha, novoUsuario.plano);
-    setNovoUsuario({
-      nome: '',
-      email: '',
-      senha: '',
-      plano: 'teste_gratuito'
-    });
+    setCriandoUsuario(true);
+    
+    try {
+      // Usar a Edge Function para criar usuário
+      const { data, error } = await supabase.functions.invoke('create-user', {
+        body: {
+          email: novoUsuario.email,
+          password: novoUsuario.senha,
+          nome: novoUsuario.nome,
+          plano: novoUsuario.plano
+        }
+      });
+
+      if (error) {
+        console.error('Erro ao criar usuário:', error);
+        toast({
+          title: "Erro",
+          description: "Erro ao criar usuário. Verifique se o e-mail já não está cadastrado.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      if (data?.error) {
+        toast({
+          title: "Erro",
+          description: data.error,
+          variant: "destructive"
+        });
+        return;
+      }
+
+      toast({
+        title: "Sucesso!",
+        description: "Usuário criado com sucesso"
+      });
+
+      setNovoUsuario({
+        nome: '',
+        email: '',
+        senha: '',
+        plano: 'teste_gratuito'
+      });
+
+      // Recarregar métricas
+      window.location.reload();
+
+    } catch (error) {
+      console.error('Erro ao criar usuário:', error);
+      toast({
+        title: "Erro",
+        description: "Erro inesperado ao criar usuário",
+        variant: "destructive"
+      });
+    } finally {
+      setCriandoUsuario(false);
+    }
   };
 
   const getStatusColor = (status: string) => {
@@ -84,19 +136,15 @@ const Admin = () => {
 
   return (
     <Layout>
-      <div className="space-y-6 max-w-full overflow-hidden">
-        {/* Header com Logo */}
+      <div className="space-y-6 max-w-full overflow-x-hidden p-4 sm:p-6">
+        {/* Header */}
         <div className="flex items-center space-x-4">
           <div className="p-2 bg-[#F42000]/10 rounded-lg">
-            <img 
-              src="/lovable-uploads/df4ec87a-f5c9-4334-a247-0a1947d73246.png" 
-              alt="MEI Finance" 
-              className="h-8 w-auto"
-            />
+            <Shield className="h-8 w-8 text-[#F42000]" />
           </div>
-          <div>
-            <h1 className="text-3xl font-bold text-[#2E2E2E]">Painel Administrativo</h1>
-            <p className="text-gray-600 mt-1">Métricas e gerenciamento da plataforma MEI Finance</p>
+          <div className="flex-1 min-w-0">
+            <h1 className="text-2xl sm:text-3xl font-bold text-[#2E2E2E] break-words">MEI Finance - Admin</h1>
+            <p className="text-gray-600 mt-1 break-words">Métricas e gerenciamento da plataforma</p>
           </div>
         </div>
 
@@ -132,12 +180,12 @@ const Admin = () => {
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Criar Usuário Manualmente */}
           <Card className="bg-white border border-gray-100 shadow-sm">
             <CardHeader>
-              <CardTitle className="text-lg font-semibold text-[#2E2E2E] flex items-center">
-                <UserPlus className="h-5 w-5 mr-2 text-[#F42000]" />
+              <CardTitle className="text-lg font-semibold text-[#2E2E2E] flex items-center break-words">
+                <UserPlus className="h-5 w-5 mr-2 text-[#F42000] flex-shrink-0" />
                 Criar Usuário Manualmente
               </CardTitle>
             </CardHeader>
@@ -146,21 +194,24 @@ const Admin = () => {
                 placeholder="Nome completo"
                 value={novoUsuario.nome}
                 onChange={(e) => setNovoUsuario({...novoUsuario, nome: e.target.value})}
+                className="w-full"
               />
               <Input
                 type="email"
                 placeholder="E-mail"
                 value={novoUsuario.email}
                 onChange={(e) => setNovoUsuario({...novoUsuario, email: e.target.value})}
+                className="w-full"
               />
               <Input
                 type="password"
                 placeholder="Senha"
                 value={novoUsuario.senha}
                 onChange={(e) => setNovoUsuario({...novoUsuario, senha: e.target.value})}
+                className="w-full"
               />
               <Select value={novoUsuario.plano} onValueChange={(value) => setNovoUsuario({...novoUsuario, plano: value})}>
-                <SelectTrigger>
+                <SelectTrigger className="w-full">
                   <SelectValue placeholder="Selecione o plano" />
                 </SelectTrigger>
                 <SelectContent>
@@ -172,10 +223,11 @@ const Admin = () => {
               </Select>
               <Button 
                 onClick={handleCriarUsuario}
+                disabled={criandoUsuario}
                 className="w-full bg-[#F42000] hover:bg-[#F42000]/90 text-white"
               >
                 <UserPlus className="h-4 w-4 mr-2" />
-                Criar Usuário
+                {criandoUsuario ? 'Criando...' : 'Criar Usuário'}
               </Button>
             </CardContent>
           </Card>
@@ -183,8 +235,8 @@ const Admin = () => {
           {/* Criar Código de Parceria */}
           <Card className="bg-white border border-gray-100 shadow-sm">
             <CardHeader>
-              <CardTitle className="text-lg font-semibold text-[#2E2E2E] flex items-center">
-                <Gift className="h-5 w-5 mr-2 text-[#F42000]" />
+              <CardTitle className="text-lg font-semibold text-[#2E2E2E] flex items-center break-words">
+                <Gift className="h-5 w-5 mr-2 text-[#F42000] flex-shrink-0" />
                 Criar Código de Parceria
               </CardTitle>
             </CardHeader>
@@ -193,17 +245,20 @@ const Admin = () => {
                 placeholder="Código (ex: PARCEIRO2024)"
                 value={novoCodigo}
                 onChange={(e) => setNovoCodigo(e.target.value.toUpperCase())}
+                className="w-full"
               />
               <Input
                 placeholder="Descrição (opcional)"
                 value={descricaoCodigo}
                 onChange={(e) => setDescricaoCodigo(e.target.value)}
+                className="w-full"
               />
               <Input
                 type="number"
                 placeholder="Uso máximo (opcional)"
                 value={usoMaximo || ''}
                 onChange={(e) => setUsoMaximo(e.target.value ? parseInt(e.target.value) : undefined)}
+                className="w-full"
               />
               <Button 
                 onClick={handleCriarCodigo}
@@ -219,26 +274,26 @@ const Admin = () => {
         {/* Estatísticas de Uso */}
         <Card className="bg-white border border-gray-100 shadow-sm">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-[#2E2E2E] flex items-center">
-              <FileText className="h-5 w-5 mr-2 text-[#F42000]" />
+            <CardTitle className="text-lg font-semibold text-[#2E2E2E] flex items-center break-words">
+              <FileText className="h-5 w-5 mr-2 text-[#F42000] flex-shrink-0" />
               Estatísticas de Uso
             </CardTitle>
           </CardHeader>
           <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="flex justify-between items-center p-3 border border-gray-100 rounded-lg">
-              <span className="text-gray-600">Total de PDFs Exportados</span>
+              <span className="text-gray-600 break-words">Total de PDFs Exportados</span>
               <Badge variant="outline" className="text-[#F42000]">
                 {metrics.totalExportacoesPDF}
               </Badge>
             </div>
             <div className="flex justify-between items-center p-3 border border-gray-100 rounded-lg">
-              <span className="text-gray-600">Usuários com Parcerias</span>
+              <span className="text-gray-600 break-words">Usuários com Parcerias</span>
               <Badge variant="outline" className="text-blue-600">
                 {metrics.usuariosParcerias}
               </Badge>
             </div>
             <div className="flex justify-between items-center p-3 border border-gray-100 rounded-lg">
-              <span className="text-gray-600">Códigos de Parceria</span>
+              <span className="text-gray-600 break-words">Códigos de Parceria</span>
               <Badge variant="outline" className="text-green-600">
                 {metrics.codigosParcerias.length}
               </Badge>
@@ -249,7 +304,7 @@ const Admin = () => {
         {/* Códigos de Parceria */}
         <Card className="bg-white border border-gray-100 shadow-sm">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-[#2E2E2E]">
+            <CardTitle className="text-lg font-semibold text-[#2E2E2E] break-words">
               Códigos de Parceria Ativos
             </CardTitle>
           </CardHeader>
@@ -259,14 +314,14 @@ const Admin = () => {
                 <p className="text-gray-500 text-center py-4">Nenhum código de parceria criado</p>
               ) : (
                 metrics.codigosParcerias.map((codigo) => (
-                  <div key={codigo.id} className="flex items-center justify-between p-3 border border-gray-100 rounded-lg">
-                    <div>
-                      <p className="font-medium text-[#2E2E2E]">{codigo.codigo}</p>
+                  <div key={codigo.id} className="flex items-center justify-between p-3 border border-gray-100 rounded-lg flex-wrap gap-2">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-[#2E2E2E] break-words">{codigo.codigo}</p>
                       {codigo.descricao && (
-                        <p className="text-sm text-gray-500">{codigo.descricao}</p>
+                        <p className="text-sm text-gray-500 break-words">{codigo.descricao}</p>
                       )}
                     </div>
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-2 flex-shrink-0">
                       <span className="text-sm text-gray-600">
                         {codigo.uso_atual || 0}/{codigo.uso_maximo || '∞'}
                       </span>
@@ -284,7 +339,7 @@ const Admin = () => {
         {/* Gerenciamento de Usuários */}
         <Card className="bg-white border border-gray-100 shadow-sm">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-[#2E2E2E]">
+            <CardTitle className="text-lg font-semibold text-[#2E2E2E] break-words">
               Gerenciamento de Usuários
             </CardTitle>
           </CardHeader>
@@ -294,10 +349,10 @@ const Admin = () => {
                 <p className="text-gray-500 text-center py-4">Nenhum usuário para gerenciar</p>
               ) : (
                 metrics.usuariosParaGerenciar.map((usuario) => (
-                  <div key={usuario.id} className="flex items-center justify-between p-3 border border-gray-100 rounded-lg">
-                    <div className="flex-1">
-                      <p className="font-medium text-[#2E2E2E]">Usuário ID: {usuario.user_id}</p>
-                      <div className="flex items-center space-x-2 mt-1">
+                  <div key={usuario.id} className="flex items-center justify-between p-3 border border-gray-100 rounded-lg flex-wrap gap-2">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-[#2E2E2E] break-words">Usuário ID: {usuario.user_id}</p>
+                      <div className="flex items-center space-x-2 mt-1 flex-wrap gap-1">
                         <Badge className={getStatusColor(usuario.assinaturas?.[0]?.status || 'teste_gratuito')}>
                           {usuario.assinaturas?.[0]?.status || 'teste_gratuito'}
                         </Badge>
@@ -308,7 +363,7 @@ const Admin = () => {
                         )}
                       </div>
                     </div>
-                    <div className="flex space-x-2">
+                    <div className="flex space-x-2 flex-shrink-0">
                       {!usuario.liberado ? (
                         <Button
                           size="sm"
