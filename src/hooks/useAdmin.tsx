@@ -134,16 +134,16 @@ export const useAdmin = () => {
         console.error('Erro ao buscar usuários para gerenciar:', usuariosError);
       }
 
-      // Calcular métricas
+      // Calcular métricas corrigidas
       const totalUsuarios = profiles?.length || 0;
       
-      // Contar por status de assinatura
+      // Contar por status de assinatura - corrigindo os valores
       const usuariosTesteGratuito = assinaturas?.filter(
-        a => a.status === 'teste_gratuito' || a.status === 'ativo'
+        a => a.status === 'teste_gratuito' || a.status === 'trial' || a.status === 'ativo'
       ).length || 0;
       
       const usuariosPremium = assinaturas?.filter(
-        a => a.status === 'premium' || a.status === 'pago'
+        a => a.status === 'premium' || a.status === 'paid' || a.status === 'active'
       ).length || 0;
       
       const usuariosLiberados = usuariosLiberadosData?.length || 0;

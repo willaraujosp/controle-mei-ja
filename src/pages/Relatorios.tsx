@@ -74,10 +74,16 @@ const Relatorios = () => {
       setLoading(true);
       const { dataInicio, dataFim } = getPeriodoData();
 
+      // Garantir que o user_id seja usado corretamente
+      const userId = user?.id;
+      if (!userId) {
+        throw new Error('Usuário não autenticado');
+      }
+
       const { data, error } = await supabase
         .from('movimentacoes')
         .select('*')
-        .eq('user_id', user?.id)
+        .eq('user_id', userId)
         .gte('data', format(dataInicio, 'yyyy-MM-dd'))
         .lte('data', format(dataFim, 'yyyy-MM-dd'))
         .order('data', { ascending: false });

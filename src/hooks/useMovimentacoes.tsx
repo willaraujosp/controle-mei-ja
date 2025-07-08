@@ -52,9 +52,10 @@ export const useMovimentacoes = () => {
 
   const addMovimentacao = async (movimentacao: Omit<Movimentacao, 'id' | 'created_at'>) => {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
       const { data, error } = await supabase
         .from('movimentacoes')
-        .insert([{ ...movimentacao, user_id: null }])
+        .insert([{ ...movimentacao, user_id: user?.id }])
         .select()
         .single();
 

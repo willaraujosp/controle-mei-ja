@@ -289,9 +289,9 @@ const Lancamentos = () => {
                 </p>
               ) : (
                 movimentacoes.map((lancamento) => (
-                  <div key={lancamento.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-                    <div className="flex items-center space-x-4">
-                      <div className={`p-2 rounded-full ${
+                  <div key={lancamento.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors space-y-3 sm:space-y-0">
+                    <div className="flex items-center space-x-3 sm:space-x-4 min-w-0 flex-1">
+                      <div className={`p-2 rounded-full flex-shrink-0 ${
                         lancamento.tipo === 'entrada' ? 'bg-green-100' : 'bg-red-100'
                       }`}>
                         {lancamento.tipo === 'entrada' ? (
@@ -300,10 +300,10 @@ const Lancamentos = () => {
                           <TrendingDown className="h-4 w-4 text-red-600" />
                         )}
                       </div>
-                      <div>
-                        <p className="font-medium text-mei-text">{lancamento.descricao || `${lancamento.categoria} - ${lancamento.tipo}`}</p>
-                        <div className="flex items-center space-x-2 mt-1">
-                          <p className="text-sm text-gray-500">{formatDate(lancamento.data)}</p>
+                      <div className="min-w-0 flex-1">
+                        <p className="font-medium text-mei-text text-sm sm:text-base truncate">{lancamento.descricao || `${lancamento.categoria} - ${lancamento.tipo}`}</p>
+                        <div className="flex flex-wrap items-center gap-2 mt-1">
+                          <p className="text-xs sm:text-sm text-gray-500">{formatDate(lancamento.data)}</p>
                           <Badge variant="outline" className="text-xs">
                             {lancamento.categoria}
                           </Badge>
@@ -311,9 +311,9 @@ const Lancamentos = () => {
                       </div>
                     </div>
                     
-                    <div className="flex items-center space-x-4">
-                      <div className="text-right">
-                        <p className={`font-bold ${
+                    <div className="flex items-center justify-between sm:justify-end sm:space-x-4">
+                      <div className="text-left sm:text-right">
+                        <p className={`font-bold text-sm sm:text-base ${
                           lancamento.tipo === 'entrada' ? 'text-green-600' : 'text-red-600'
                         }`}>
                           {lancamento.tipo === 'entrada' ? '+' : '-'}{formatCurrency(Number(lancamento.valor))}
@@ -330,21 +330,22 @@ const Lancamentos = () => {
                         </Badge>
                       </div>
                       
-                      <div className="flex space-x-2">
+                      <div className="flex space-x-1 sm:space-x-2">
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => handleEdit(lancamento)}
+                          className="h-8 w-8 p-0 sm:h-9 sm:w-9"
                         >
-                          <Edit className="h-4 w-4" />
+                          <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
                         </Button>
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => handleDelete(lancamento.id)}
-                          className="text-red-600 hover:text-red-800"
+                          className="text-red-600 hover:text-red-800 h-8 w-8 p-0 sm:h-9 sm:w-9"
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
                         </Button>
                       </div>
                     </div>
