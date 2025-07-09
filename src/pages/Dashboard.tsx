@@ -132,10 +132,11 @@ const Dashboard = () => {
           </div>
           <Button 
             onClick={() => navigate('/lancamentos')}
-            className="mei-button mt-4 sm:mt-0"
+            className="mei-button dashboard-button mt-4 sm:mt-0"
           >
             <Plus className="h-4 w-4 mr-2" />
-            Novo Lançamento
+            <span className="hidden sm:inline">Novo Lançamento</span>
+            <span className="sm:hidden">Novo</span>
           </Button>
         </div>
 
@@ -288,8 +289,10 @@ const Dashboard = () => {
               variant="outline" 
               size="sm"
               onClick={() => navigate('/lancamentos')}
+              className="dashboard-button"
             >
-              Ver todos
+              <span className="hidden sm:inline">Ver todos</span>
+              <span className="sm:hidden">Ver</span>
             </Button>
           </CardHeader>
           <CardContent>

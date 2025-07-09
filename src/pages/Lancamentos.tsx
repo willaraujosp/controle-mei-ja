@@ -127,9 +127,10 @@ const Lancamentos = () => {
           
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="mei-button mt-4 sm:mt-0" onClick={resetForm}>
+              <Button className="mei-button dashboard-button mt-4 sm:mt-0" onClick={resetForm}>
                 <Plus className="h-4 w-4 mr-2" />
-                Novo Lançamento
+                <span className="hidden sm:inline">Novo Lançamento</span>
+                <span className="sm:hidden">Novo</span>
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">

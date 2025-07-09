@@ -219,7 +219,45 @@ const Index = () => {
           </p>
         </header>
 
-        {/* Main Content - Two Columns */}
+        {/* Hero Section with Image */}
+        <div className="grid lg:grid-cols-2 gap-6 sm:gap-12 items-center max-w-7xl mx-auto mb-12 sm:mb-16">
+          
+          {/* Left Side - Commercial Image */}
+          <div className="order-2 lg:order-1 flex justify-center">
+            <img 
+              src="/lovable-uploads/22541256-70c9-42ce-90a1-2ca83b82e8af.png" 
+              alt="MEI Finance - Controle Financeiro Profissional" 
+              className="w-full max-w-md lg:max-w-lg rounded-xl shadow-2xl"
+            />
+          </div>
+          
+          {/* Right Side - Hero Content */}
+          <div className="order-1 lg:order-2 space-y-6 sm:space-y-8 px-2">
+            <div className="space-y-4 sm:space-y-6">
+              <h2 className="text-3xl sm:text-4xl font-bold text-mei-text break-words leading-tight">
+                Controle suas finanças como um <span className="text-mei-red">banco digital</span>
+              </h2>
+              <p className="text-base sm:text-lg text-gray-600 break-words">
+                Interface profissional, relatórios completos e segurança bancária para o seu MEI.
+              </p>
+            </div>
+            
+            <Button
+              onClick={() => {
+                const registerTab = document.querySelector('[data-value="register"]') as HTMLButtonElement;
+                registerTab?.click();
+                const formSection = document.querySelector('#auth-form');
+                formSection?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="mei-button text-lg py-6 px-8 w-full sm:w-auto"
+            >
+              Comece Agora – É grátis por 3 dias
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+          </div>
+        </div>
+
+        {/* Main Content - Benefits */}
         <div className="grid lg:grid-cols-2 gap-6 sm:gap-12 items-start max-w-7xl mx-auto">
           
           {/* Left Side - Benefits */}
@@ -272,7 +310,7 @@ const Index = () => {
           </div>
 
           {/* Right Side - Login/Register Form */}
-          <div className="lg:sticky lg:top-8 w-full px-2">
+          <div className="lg:sticky lg:top-8 w-full px-2" id="auth-form">
             <Card className="p-4 sm:p-8 shadow-lg border-0 bg-white/95 backdrop-blur w-full max-w-full">
               {!showForgotPassword ? (
                 <Tabs defaultValue="register" className="w-full">

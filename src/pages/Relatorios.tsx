@@ -287,7 +287,7 @@ const Relatorios = () => {
 
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
             <Select value={periodo} onValueChange={setPeriodo}>
-              <SelectTrigger className="w-full sm:w-[180px]">
+              <SelectTrigger className="w-full sm:w-[140px] text-sm">
                 <Calendar className="h-4 w-4 mr-2" />
                 <SelectValue />
               </SelectTrigger>
@@ -301,10 +301,11 @@ const Relatorios = () => {
             <Button
               onClick={exportarPDF}
               disabled={exportando || movimentacoes.length === 0}
-              className="bg-[#F42000] hover:bg-[#F42000]/90 text-white w-full sm:w-auto"
+              className="bg-[#F42000] hover:bg-[#F42000]/90 text-white w-full sm:w-auto px-3 py-2 text-sm"
             >
               <Download className="h-4 w-4 mr-2" />
-              {exportando ? 'Exportando...' : 'Exportar PDF'}
+              <span className="hidden sm:inline">{exportando ? 'Exportando...' : 'Exportar PDF'}</span>
+              <span className="sm:hidden">{exportando ? 'Export...' : 'PDF'}</span>
             </Button>
           </div>
         </div>
