@@ -282,71 +282,77 @@ const Lancamentos = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
+            <div className="space-y-3">
               {movimentacoes.length === 0 ? (
                 <p className="text-gray-500 text-center py-8">
                   Nenhum lançamento encontrado. Clique em "Novo Lançamento" para começar.
                 </p>
               ) : (
                 movimentacoes.map((lancamento) => (
-                  <div key={lancamento.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors space-y-3 sm:space-y-0">
-                    <div className="flex items-center space-x-3 sm:space-x-4 min-w-0 flex-1">
-                      <div className={`p-2 rounded-full flex-shrink-0 ${
-                        lancamento.tipo === 'entrada' ? 'bg-green-100' : 'bg-red-100'
-                      }`}>
-                        {lancamento.tipo === 'entrada' ? (
-                          <TrendingUp className="h-4 w-4 text-green-600" />
-                        ) : (
-                          <TrendingDown className="h-4 w-4 text-red-600" />
-                        )}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="font-medium text-mei-text text-sm sm:text-base truncate">{lancamento.descricao || `${lancamento.categoria} - ${lancamento.tipo}`}</p>
-                        <div className="flex flex-wrap items-center gap-2 mt-1">
-                          <p className="text-xs sm:text-sm text-gray-500">{formatDate(lancamento.data)}</p>
-                          <Badge variant="outline" className="text-xs">
-                            {lancamento.categoria}
-                          </Badge>
+                  <div key={lancamento.id} className="card-lancamento border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors bg-white w-full">
+                    <div className="flex flex-col space-y-2">
+                      <div className="flex items-start space-x-3">
+                        <div className={`p-2 rounded-full flex-shrink-0 ${
+                          lancamento.tipo === 'entrada' ? 'bg-green-100' : 'bg-red-100'
+                        }`}>
+                          {lancamento.tipo === 'entrada' ? (
+                            <TrendingUp className="h-4 w-4 text-green-600" />
+                          ) : (
+                            <TrendingDown className="h-4 w-4 text-red-600" />
+                          )}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="font-medium text-mei-text text-sm break-words">
+                            {lancamento.descricao || `${lancamento.categoria} - ${lancamento.tipo}`}
+                          </p>
+                          <div className="flex flex-col gap-1 mt-1">
+                            <p className="text-xs text-gray-500">{formatDate(lancamento.data)}</p>
+                            <Badge variant="outline" className="text-xs w-fit">
+                              {lancamento.categoria}
+                            </Badge>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    
-                    <div className="flex items-center justify-between sm:justify-end sm:space-x-4">
-                      <div className="text-left sm:text-right">
-                        <p className={`font-bold text-sm sm:text-base ${
-                          lancamento.tipo === 'entrada' ? 'text-green-600' : 'text-red-600'
-                        }`}>
-                          {lancamento.tipo === 'entrada' ? '+' : '-'}{formatCurrency(Number(lancamento.valor))}
-                        </p>
-                        <Badge
-                          variant={lancamento.status === 'recebido' || lancamento.status === 'pago' ? 'default' : 'secondary'}
-                          className={`text-xs ${
-                            lancamento.status === 'recebido' || lancamento.status === 'pago' 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-yellow-100 text-yellow-800'
-                          }`}
-                        >
-                          {lancamento.status === 'pago' ? 'Pago' : lancamento.status === 'recebido' ? 'Recebido' : 'Pendente'}
-                        </Badge>
-                      </div>
                       
-                      <div className="flex space-x-1 sm:space-x-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleEdit(lancamento)}
-                          className="h-8 w-8 p-0 sm:h-9 sm:w-9"
-                        >
-                          <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDelete(lancamento.id)}
-                          className="text-red-600 hover:text-red-800 h-8 w-8 p-0 sm:h-9 sm:w-9"
-                        >
-                          <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
-                        </Button>
+                      <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+                        <div className="flex flex-col">
+                          <p className={`font-bold text-sm ${
+                            lancamento.tipo === 'entrada' ? 'text-green-600' : 'text-red-600'
+                          }`}>
+                            {lancamento.tipo === 'entrada' ? '+' : '-'}{formatCurrency(Number(lancamento.valor))}
+                          </p>
+                          <Badge
+                            variant={lancamento.status === 'recebido' || lancamento.status === 'pago' ? 'default' : 'secondary'}
+                            className={`text-xs w-fit ${
+                              lancamento.status === 'recebido' || lancamento.status === 'pago' 
+                                ? 'bg-green-100 text-green-800' 
+                                : 'bg-yellow-100 text-yellow-800'
+                            }`}
+                          >
+                            {lancamento.status === 'pago' ? 'Pago' : lancamento.status === 'recebido' ? 'Recebido' : 'Pendente'}
+                          </Badge>
+                        </div>
+                        
+                        <div className="botoes flex space-x-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleEdit(lancamento)}
+                            className="h-8 w-8 p-0 hover:bg-blue-50"
+                            title="Editar"
+                          >
+                            <Edit className="h-4 w-4 text-blue-600" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDelete(lancamento.id)}
+                            className="h-8 w-8 p-0 hover:bg-red-50"
+                            title="Excluir"
+                          >
+                            <Trash2 className="h-4 w-4 text-red-600" />
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   </div>

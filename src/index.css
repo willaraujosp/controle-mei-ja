@@ -79,3 +79,50 @@ All colors MUST be HSL.
     @apply bg-white rounded-lg shadow-sm border border-gray-100 p-6;
   }
 }
+
+/* Mobile responsive styles for Lançamentos */
+.card-lancamento {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 10px;
+  background-color: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.card-lancamento .botoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+@media (max-width: 600px) {
+  .card-lancamento {
+    font-size: 13px;
+    padding: 10px;
+  }
+
+  .card-lancamento .botoes {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .card-lancamento span, .card-lancamento strong {
+    word-break: break-word;
+    font-size: 12px;
+  }
+}
+
+/* Table responsive styles */
+.lancamentos-tabela-wrapper {
+  overflow-x: auto;
+  width: 100%;
+}
+
+.lancamentos-tabela {
+  min-width: 600px;
+  white-space: nowrap;
+}
