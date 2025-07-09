@@ -24,9 +24,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        console.log('Auth state changed:', event, session?.user?.email);
+        
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
+        
+        // Se o evento for SIGNED_OUT, garantir limpeza completa
+        if (event === 'SIGNED_OUT') {
+          setSession(null);
+          setUser(null);
+          localStorage.clear();
+          sessionStorage.clear();
+        }
       }
     );
 
@@ -83,9 +93,33 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      console.error('Erro no logout:', error);
+    try {
+      // Limpar estado local primeiro
+      setUser(null);
+      setSession(null);
+      
+      // Fazer logout no Supabase
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        console.error('Erro no logout:', error);
+        throw error;
+      }
+      
+      // Limpar qualquer cache local adicional
+      localStorage.clear();
+      sessionStorage.clear();
+      
+      // Redirecionamento será feito no Layout após o toast
+      
+    } catch (error) {
+      console.error('Erro crítico no logout:', error);
+      // Mesmo com erro, forçar logout local
+      setUser(null);
+      setSession(null);
+      localStorage.clear();
+      sessionStorage.clear();
+      throw error;
     }
   };
 

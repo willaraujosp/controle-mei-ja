@@ -41,12 +41,30 @@ const Layout = ({ children }: LayoutProps) => {
   const handleLogout = async () => {
     try {
       await signOut();
+      
       toast({
         title: "Logout realizado",
-        description: "Até logo!",
+        description: "Redirecionando...",
       });
+      
+      // Forçar redirecionamento após breve delay para o toast aparecer
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 1000);
+      
     } catch (error) {
       console.error('Erro no logout:', error);
+      
+      toast({
+        title: "Erro no logout",
+        description: "Tentando sair mesmo assim...",
+        variant: "destructive"
+      });
+      
+      // Mesmo com erro, forçar redirecionamento
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 1500);
     }
   };
 
