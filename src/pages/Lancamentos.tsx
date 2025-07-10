@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { TrendingUp, TrendingDown, Plus, Edit, Trash2 } from 'lucide-react';
 import Layout from '@/components/Layout';
 import { useMovimentacoes, type Movimentacao } from '@/hooks/useMovimentacoes';
+import SubscriptionGuard from '@/components/SubscriptionGuard';
 
 const Lancamentos = () => {
   const { movimentacoes, loading, addMovimentacao, updateMovimentacao, deleteMovimentacao } = useMovimentacoes();
@@ -117,6 +118,7 @@ const Lancamentos = () => {
 
   return (
     <Layout>
+      <SubscriptionGuard feature="os lançamentos financeiros">
       <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
@@ -363,6 +365,7 @@ const Lancamentos = () => {
           </CardContent>
         </Card>
       </div>
+      </SubscriptionGuard>
     </Layout>
   );
 };

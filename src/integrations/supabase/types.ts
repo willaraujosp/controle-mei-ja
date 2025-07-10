@@ -20,8 +20,12 @@ export type Database = {
           data_fim: string | null
           data_inicio: string
           id: string
+          is_trial_active: boolean | null
           plano: string | null
           status: string
+          subscription_active: boolean | null
+          trial_end_date: string | null
+          trial_start_date: string | null
           user_id: string | null
         }
         Insert: {
@@ -29,8 +33,12 @@ export type Database = {
           data_fim?: string | null
           data_inicio?: string
           id?: string
+          is_trial_active?: boolean | null
           plano?: string | null
           status: string
+          subscription_active?: boolean | null
+          trial_end_date?: string | null
+          trial_start_date?: string | null
           user_id?: string | null
         }
         Update: {
@@ -38,8 +46,12 @@ export type Database = {
           data_fim?: string | null
           data_inicio?: string
           id?: string
+          is_trial_active?: boolean | null
           plano?: string | null
           status?: string
+          subscription_active?: boolean | null
+          trial_end_date?: string | null
+          trial_start_date?: string | null
           user_id?: string | null
         }
         Relationships: []
@@ -276,7 +288,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      check_subscription_status: {
+        Args: { user_uuid: string }
+        Returns: {
+          has_active_trial: boolean
+          has_active_subscription: boolean
+          trial_days_remaining: number
+          trial_expired: boolean
+          should_block_access: boolean
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never

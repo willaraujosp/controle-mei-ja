@@ -13,6 +13,7 @@ import Layout from '@/components/Layout';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from '@/hooks/use-toast';
+import SubscriptionGuard from '@/components/SubscriptionGuard';
 
 interface Movimentacao {
   id: string;
@@ -268,7 +269,8 @@ const Relatorios = () => {
 
   return (
     <Layout>
-      <div className="space-y-6 max-w-full overflow-hidden px-4 sm:px-6">
+      <SubscriptionGuard feature="os relatórios financeiros">
+        <div className="space-y-6 max-w-full overflow-hidden px-4 sm:px-6">
         {/* Header com Logo */}
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between space-y-4 md:space-y-0">
           <div className="flex items-center space-x-4">
@@ -430,6 +432,7 @@ const Relatorios = () => {
           </CardContent>
         </Card>
       </div>
+      </SubscriptionGuard>
     </Layout>
   );
 };
