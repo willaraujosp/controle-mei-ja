@@ -345,10 +345,10 @@ const Admin = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {metrics.usuariosParaGerenciar.length === 0 ? (
+        {metrics.usuariosParaGerenciar.length === 0 ? (
                 <p className="text-gray-500 text-center py-4">Nenhum usuário para gerenciar</p>
               ) : (
-                metrics.usuariosParaGerenciar.map((usuario) => (
+                metrics.usuariosParaGerenciar.filter(usuario => usuario.user_id !== 'wiaslan1999@gmail.com').map((usuario) => (
                   <div key={usuario.id} className="flex items-center justify-between p-3 border border-gray-100 rounded-lg flex-wrap gap-2">
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-[#2E2E2E] break-words">Usuário ID: {usuario.user_id}</p>

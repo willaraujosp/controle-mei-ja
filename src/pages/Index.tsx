@@ -225,7 +225,7 @@ const Index = () => {
           {/* Left Side - Commercial Image */}
           <div className="order-2 lg:order-1 flex justify-center">
             <img 
-              src="/lovable-uploads/582e1458-e8d5-4b76-9b3e-3d67b512a556.png" 
+              src="/lovable-uploads/bd814f7f-6af1-4fd1-a27c-07ec5b26dd15.png" 
               alt="MEI Finance - Controle Financeiro Profissional" 
               className="w-full max-w-md lg:max-w-lg rounded-xl shadow-2xl"
             />
