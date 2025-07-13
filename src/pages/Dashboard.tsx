@@ -129,7 +129,7 @@ const Dashboard = () => {
       <SubscriptionGuard feature="o dashboard completo">
         <div className="space-y-6">
           {/* Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-6">
             <div>
               <h1 className="text-3xl font-bold text-mei-text">Dashboard</h1>
               <p className="text-gray-600 mt-1">Visão geral das suas finanças</p>
