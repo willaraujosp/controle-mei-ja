@@ -145,7 +145,7 @@ const Dashboard = () => {
           </div>
 
           {/* Cards de resumo */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 p-6">
             <Card className="mei-card">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium text-gray-600">
@@ -216,7 +216,7 @@ const Dashboard = () => {
           </div>
 
           {/* Gráficos */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 p-6">
             {/* Gráfico de barras - Movimentações mensais */}
             <Card className="mei-card">
               <CardHeader>
@@ -284,7 +284,7 @@ const Dashboard = () => {
           </div>
 
           {/* Últimos lançamentos */}
-          <Card className="mei-card">
+          <Card className="mei-card p-6">
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle className="text-lg font-semibold text-mei-text">
                 Últimos Lançamentos
