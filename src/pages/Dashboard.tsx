@@ -289,7 +289,7 @@ const Dashboard = () => {
               <CardTitle className="text-lg font-semibold text-mei-text">
                 Últimos Lançamentos
               </CardTitle>
-              <Button 
+              <Button    
                 variant="outline" 
                 size="sm"
                 onClick={() => navigate('/lancamentos')}
